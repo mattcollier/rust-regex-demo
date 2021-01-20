@@ -57,10 +57,10 @@ lazy_static! {
     static ref LITERAL: String = format!("(?:{}(?:{}|{})?)", PLAIN, DATATYPE.as_str(), LANGUAGE);
   
     // define quad part regexes
-    static ref SUBJECT: String = format!("(?:{}|{}){}", IRI,  BNODE.as_str(), WS);
-    static ref PROPERTY: String = format!("{}{}", IRI, WS);
-    static ref OBJECT: String = format!("(?:{}|{}|{}){}", IRI, BNODE.as_str(), LITERAL.as_str(), WSO);
-    static ref GRAPH: String = format!("(?:\\.|(?:(?:{}|{}){}\\.))", IRI, BNODE.as_str(), WSO);
+    static ref SUBJECT: String = format!("(?:{}|{})", BNODE.as_str(), IRI);
+    static ref PROPERTY: String = format!("{}", IRI);
+    static ref OBJECT: String = format!("(?:{}|{}|{})", IRI, BNODE.as_str(), LITERAL.as_str());
+    static ref GRAPH: String = format!("(?:\\.|(?:(?:{}|{})))", IRI, BNODE.as_str());
   
     // full quad regex
     static ref QUAD: String = format!(
@@ -73,10 +73,47 @@ lazy_static! {
         WSO
     );
   
+    static ref FIRST: String = format!("^{}{}", WSO, SUBJECT.as_str());
+    static ref SUBJECT_REGEX: Regex = Regex::new(&FIRST).unwrap();
+
+    static ref SECOND: String = format!("{}", SUBJECT.as_str());
+    static ref PROPERTY_REGEX: Regex = Regex::new(&SECOND).unwrap();
+
+    static ref THIRD: String = format!("{}", OBJECT.as_str());
+    static ref OBJECT_REGEX: Regex = Regex::new(&THIRD).unwrap();
+
+    static ref FOURTH: String = format!("{}", GRAPH.as_str());
+    static ref GRAPH_REGEX: Regex = Regex::new(&FOURTH).unwrap();    
   
     static ref QUAD_REGEX: Regex = Regex::new(&QUAD).unwrap();
   }
 
-  pub fn parse_quads(target: &str) -> regex::Captures {
-    QUAD_REGEX.captures(target).unwrap()
+  // pub fn parse_quads(target: &str) -> regex::Captures {
+
+  pub fn parse_quads(target: &str) {
+    let t: Vec<&str> = target.split(' ').collect();
+    // let s = t[0];
+    // let t = t[1];
+    // let u = t[2 as usize];
+
+    for (pos, p) in t.iter().enumerate() {
+      match pos {
+        0 => SUBJECT_REGEX.captures(p),
+        1 => PROPERTY_REGEX.captures(p),
+        2 => None,
+        // 2 => OBJECT_REGEX.captures(p),
+        3 => GRAPH_REGEX.captures(p),        
+        _ => None
+      };
+      // println!("TTTTTTTt {}", p);
+    }
+
+
+    // let w = SUBJECT_REGEX.captures(s);
+    // let x = PROPERTY_REGEX.captures(t);
+    // match y {
+    //   Some(v) => println!("xxx {}", v.len()),
+    //   None => {}
+    // }
+    // QUAD_REGEX.captures(target).unwrap()
   }
